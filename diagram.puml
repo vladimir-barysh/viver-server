@@ -1,11 +1,176 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+skinparam classAttributeIconSize 0
+hide circle
 
-autonumber
+package config {
+    class JwtAuthenticationFilter {
+        +doFilterInternal()
+    }
+    class SecurityConfig {
+    +securityFilterChain()
+    +passwordEncoder()
+    }
+    class WebSocketConfig {
+    +registerWebSocketHandlers()
+    }
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+package controller {
+    class AuthController {
+    -UserRepository userRepository
+    -JwtService jwtService
+    -PasswordEncoder passwordEncoder
+    +register()
+    +login()
+    }
+    class ChatController {
+    -MessageRepository messageRepository
+    -UserRepository userRepository
+    -ChatRepository chatRepository
+    -GroupMemberRepository groupMemberRepository
+    -GroupRepository groupRepository
+    +getMessagesByChat()
+    +sendMessage()
+    +deleteChat()
+    }
+    class GroupController {
+    -ChatRepository chatRepository
+        -GroupMemberRepository groupMemberRepository
+        -GroupRepository groupRepository
+        +createGroup()
+        +getUserGroups()
+    }
+    class UserController {
+        -GroupMemberRepository groupMemberRepository
+        -GroupRepository groupRepository
+        -UserRepository userRepository
+        +getAllUsers()
+        +getcurrentUser()
+        +getUsername()
+    }
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+package model {
+    class User {
+        - Long id
+        - String username
+        - String email
+        - String passwordHash
+    }
+
+    class Chat {
+        - Long chatId
+        - Long groupId
+    }
+
+    class ChatGroup {
+        - Long groupId
+        - String groupName
+    }
+
+    class GroupMember {
+        - GroupMemberId id
+        - User user
+        - ChatGroup group
+    }
+
+    class GroupMemberId {
+        - Long userId
+        - Long groupId
+        +equals()
+        +hashCode()
+    }
+
+    class Message {
+        - Long messageId
+        - Long chatId
+        - Long senderId
+        - String content
+        - Date timestamp
+    }
+}
+
+package repository {
+    interface UserRepository {
+    +findByUsername()
+    +findByEmail()
+    }
+    interface ChatRepository {
+    +findByGroupId()
+    }
+    interface GroupRepository
+    interface GroupMemberRepository {
+    +findByUserId()
+    +deleteByGroupId()
+    }
+    interface MessageRepository {
+    +findByChatIdOrderByTimestampAsc()
+    +deleteByChatId()
+    }
+}
+
+package request {
+    class LoginRequest {
+        - String email
+        - String password
+    }
+
+    class RegisterRequest {
+        - String email
+        - String password
+        - String username
+    }
+
+    class CreateGroupRequest {
+        - String groupName
+        - List<Long> userIds
+    }
+}
+
+package services {
+    class JwtService {
+    -String SECRET_KEY
+    -long expirationMs
+    +generateToken()
+    +validateToken()
+    +extractUserId()
+    }
+    class GroupService {
+    -GroupMemberRepository groupMemberRepository
+            -GroupRepository groupRepository
+    +createGroup()
+    }
+}
+
+package websocket {
+    class ChatWebSocketHandler {
+    -JwtService jwtService
+    -MessageRepository messageRepository
+    -ObjectMapper objectMapper
+    +afterConnectionEstablished()
+    +handleTextMessage()
+    +afterConnectionClosed()
+    +handleTransportError()
+    }
+}
+
+' ==== RELATIONS ====
+AuthController --> JwtService
+UserController --> UserRepository
+ChatController --> ChatRepository
+GroupController --> GroupService
+GroupService --> GroupRepository
+GroupService --> GroupMemberRepository
+GroupMember --> GroupMemberId
+GroupMember --> ChatGroup
+GroupMember --> User
+Message --> User
+Message --> Chat
+
+JwtAuthenticationFilter --> JwtService
+SecurityConfig --> JwtAuthenticationFilter
+WebSocketConfig --> MessageRepository
+
+ChatWebSocketHandler --> AuthController
+ChatWebSocketHandler --> WebSocketConfig
 @enduml

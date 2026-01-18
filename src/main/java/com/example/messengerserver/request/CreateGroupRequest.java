@@ -1,4 +1,4 @@
-package com.example.messengerserver.dto;
+package com.example.messengerserver.request;
 
 import java.util.List;
 
@@ -6,7 +6,6 @@ public class CreateGroupRequest {
     private String groupName;
     private List<Long> userIds;
 
-    // Геттеры и сеттеры
     public String getGroupName() {
         return groupName;
     }

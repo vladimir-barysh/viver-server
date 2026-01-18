@@ -1,11 +1,10 @@
-package com.example.messengerserver.dto;
+package com.example.messengerserver.request;
 
 public class RegisterRequest {
     private String username;
     private String email;
     private String password;
 
-    // конструкторы, геттеры и сеттеры
     public RegisterRequest() {}
 
     public RegisterRequest(String username, String email, String password) {

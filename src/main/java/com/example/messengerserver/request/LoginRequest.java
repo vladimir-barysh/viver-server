@@ -1,4 +1,4 @@
-package com.example.messengerserver.dto;
+package com.example.messengerserver.request;
 
 public class LoginRequest {
     private String email;

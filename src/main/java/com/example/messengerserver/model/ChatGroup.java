@@ -3,16 +3,18 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "groups_table")
-public class Group {
+public class ChatGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long groupId;
+    @Column(name = "group_id")
+    private Long id;
 
-    private String groupName;
+    @Column(name = "group_name", nullable = false)
+    private String name;
 
-    public Long getGroupId() { return groupId; }
-    public String getGroupName() { return groupName; }
+    public Long getId() { return id; }
+    public String getName() { return name; }
 
-    public void setGroupId(Long groupId) { this.groupId = groupId; }
-    public void setGroupName(String groupName) { this.groupName = groupName; }
+    public void setId(Long groupId) { this.id = groupId; }
+    public void setName(String groupName) { this.name = groupName; }
 }
